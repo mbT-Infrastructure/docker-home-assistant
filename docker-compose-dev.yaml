@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+
+  home-assistant:
+    container_name: home-assistant
+    build: .
+    volumes:
+      - "./data:/media/home-assistant"
+    ports:
+      - "8123:8123"
