@@ -14,6 +14,5 @@ target "default" {
     platforms = [
         "amd64",
         "arm64",
-        "arm",
     ]
 }
