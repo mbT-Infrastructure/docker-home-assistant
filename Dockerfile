@@ -5,7 +5,7 @@ RUN install-autonomous.sh install FFmpeg Scripts \
     libjpeg-dev libopenjp2-7 libssl-dev libtiff6 libturbojpeg0-dev zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install homeassistant
+RUN pip install homeassistant
 
 RUN mkdir /media/home-assistant
 
