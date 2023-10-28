@@ -7,7 +7,7 @@ RUN install-autonomous.sh install FFmpeg Scripts \
 
 RUN pip install homeassistant
 
-RUN mkdir /media/home-assistant
+COPY files/template /opt/home-assistant/template
 
 COPY entrypoint.sh /entrypoint.sh
 
