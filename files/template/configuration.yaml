@@ -1,7 +1,6 @@
 assist_pipeline:
 automation: !include automations.yaml
 backup:
-bluetooth:
 config:
 conversation:
 counter:
@@ -33,6 +32,5 @@ sun:
 system_health:
 tag:
 timer:
-usb:
 webhook:
 zone:
