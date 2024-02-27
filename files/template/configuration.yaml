@@ -1,12 +1,11 @@
 assist_pipeline:
-automation: !include automations.yaml
+automation:
 backup:
 config:
 conversation:
 counter:
 energy:
 frontend:
-  themes: !include_dir_merge_named themes
 hardware:
 history:
 homeassistant_alerts:
@@ -25,8 +24,8 @@ my:
 network:
 person:
 schedule:
-scene: !include scenes.yaml
-script: !include scripts.yaml
+scene:
+script:
 stream:
 sun:
 system_health:
