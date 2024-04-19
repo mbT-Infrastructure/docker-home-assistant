@@ -1,3 +1,15 @@
+FROM madebytimo/scripts AS builder
+
+WORKDIR /root/builder
+
+COPY files/template template
+RUN mkdir custom_components \
+    && download.sh --output goecharger-mqtt.tar.gz \
+        https://github.com/syssi/homeassistant-goecharger-mqtt/archive/refs/heads/main.tar.gz \
+    && compress.sh --decompress goecharger-mqtt.tar.gz \
+    && mv homeassistant-goecharger-mqtt-main/custom_components/goecharger_mqtt custom_components \
+    && rm -r homeassistant-goecharger-mqtt-main
+
 FROM madebytimo/python
 
 RUN install-autonomous.sh install FFmpeg Scripts \
@@ -8,7 +20,7 @@ RUN install-autonomous.sh install FFmpeg Scripts \
 
 RUN pip install homeassistant
 
-COPY files/template /opt/home-assistant/template
+COPY --from=builder /root/builder /opt/home-assistant
 
 COPY entrypoint.sh /entrypoint.sh
 
