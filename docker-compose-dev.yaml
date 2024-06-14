@@ -8,4 +8,4 @@ services:
     volumes:
       - "./data-local:/media/home-assistant"
     ports:
-      - "8000:8123"
+      - "127.0.0.1:8000:8123"
