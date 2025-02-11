@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -e -o pipefail
 
 mkdir --parents /media/home-assistant/configuration
 ln --force --no-target-directory --symbolic /opt/home-assistant/custom_components \
