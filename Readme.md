@@ -6,7 +6,7 @@ Additionally it includes ffmpeg and some scripts.
 
 ## Environment variables
 
-Currently no enviironment variables are defined.
+Currently no environment variables are defined.
 
 ## Volumes
 
@@ -20,7 +20,8 @@ To persist container data you can define some volumes. Directories that contain 
 
 ## Development
 
-To build the image locally run:
+To build and run the docker container for development execute:
+
 ```bash
-./docker-build.sh
+docker compose --file docker-compose-dev.yaml up --build
 ```
