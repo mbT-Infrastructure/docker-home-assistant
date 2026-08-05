@@ -1,14 +1,17 @@
-FROM madebytimo/scripts AS builder
+FROM --platform=$BUILDPLATFORM madebytimo/scripts AS builder
 
 WORKDIR /root/builder
 
+ADD https://github.com/home-assistant/core.git#master homeassistant
+RUN mkdir --parents packages/homeassistant \
+    && cp homeassistant/requirements{,_all}.txt packages/ \
+    && cp -r homeassistant/homeassistant/package_constraints.txt packages/homeassistant/ \
+    && rm -r homeassistant
+
+ADD https://github.com/syssi/homeassistant-goecharger-mqtt.git#:custom_components \
+    custom_components
+
 COPY files/template template
-RUN mkdir custom_components \
-    && download.sh --output goecharger-mqtt.tar.gz \
-        https://github.com/syssi/homeassistant-goecharger-mqtt/archive/refs/heads/main.tar.gz \
-    && compress.sh --decompress goecharger-mqtt.tar.gz \
-    && mv homeassistant-goecharger-mqtt-main/custom_components/goecharger_mqtt custom_components \
-    && rm -r goecharger-mqtt.tar.gz homeassistant-goecharger-mqtt-main
 
 FROM madebytimo/python
 
@@ -18,15 +21,18 @@ RUN install-autonomous.sh install FFmpeg NetworkTools Scripts \
     libturbojpeg0-dev tzdata zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
+COPY --from=builder /root/builder/ /opt/home-assistant/
 
-COPY --from=builder /root/builder /opt/home-assistant
+WORKDIR /opt/home-assistant/packages
 
-RUN python3-latest -m venv /opt/home-assistant/venv \
-    && source /opt/home-assistant/venv/bin/activate \
-    && pip install homeassistant wheel \
+RUN --mount=type=cache,target=/builder/cache/pip \
+    export PIP_CACHE_DIR=/builder/cache/pip PIP_NO_CACHE_DIR= \
+    && pip3-latest install --requirement requirements_all.txt \
+    && pip3-latest install homeassistant \
     && hass --script check_config --config /opt/home-assistant/template
 
 COPY files/entrypoint.sh files/healthcheck.sh files/run.sh /usr/local/bin/
 
+WORKDIR /media/home-assistant
 ENTRYPOINT [ "entrypoint.sh" ]
 CMD [ "run.sh" ]
