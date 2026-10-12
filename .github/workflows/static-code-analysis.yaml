@@ -55,7 +55,7 @@ jobs:
               env:
                 GH_TOKEN: ${{ github.token }}
               run: |
-                  for CACHE in $(gh cache list --key Factory-build-cache --ref ${{ github.ref}} \
+                  for CACHE in $(gh cache list --key Factory-build-cache --ref "${GITHUB_REF}" \
                       | cut --fields 1); do
                       echo "Deleting cache \"$CACHE\"."
                       gh cache delete "$CACHE"

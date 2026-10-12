@@ -55,12 +55,15 @@ jobs:
             - name: Prepare environment
               run: |
                   if [[ -f builder/docker.sh ]]; then
-                      docker buildx create --use
+                      curl --silent --location --output ~/buildkitd-gha.toml \
+                          "https://github.com/mbT-Infrastructure/template-config-files/raw/refs/\
+                  heads/main/debian/buildkit/buildkitd-gha.toml"
+                      docker buildx create --buildkitd-config ~/buildkitd-gha.toml --use
                   fi
             - name: Build
               if: ${{ github.event_name != 'schedule'}}
               run: |
-                  if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+                  if [[ "${GITHUB_REF}" == 'refs/heads/main' ]]; then
                       builder/build.sh --publish
                   else
                       builder/build.sh
@@ -73,6 +76,15 @@ jobs:
               with:
                   name: ${{ env.version }}
                   path: builds/*
+            - name: Prepare release files
+              if: ${{ github.ref == 'refs/heads/main' && env.latest_version != env.version }}
+              run: |
+                  if compgen -G "/media/workdir/*" > /dev/null; then
+                      docker run --pull missing --rm --volume "${PWD}/builds:/media/workdir" \
+                      madebytimo/scripts bash -c "set -e -o pipefail \
+                      split-big-files.sh --size 2147483647 --replace --output /media/workdir \
+                      /media/workdir/*"
+                  fi
             - name: Release
               if: ${{ github.ref == 'refs/heads/main' && env.latest_version != env.version }}
               uses: softprops/action-gh-release@v2
@@ -81,7 +93,7 @@ jobs:
                   tag_name: ${{ env.version }}
             - name: Export cache
               run: |
-                  docker run --pull always --rm \
+                  docker run --pull missing --rm \
                       --volume "/media/saved-cache:/media/saved-cache" \
                       --volume \
                       "docker-home-assistant-build-cache:/media/build-cache" \
@@ -92,8 +104,10 @@ jobs:
               env:
                 GH_TOKEN: ${{ github.token }}
               run: |
-                  for CACHE in $(gh cache list --key Factory-build-cache --ref ${{ github.ref}} \
-                      | cut --fields 1); do
+                  for CACHE in $(gh cache list \
+                          --key docker-home-assistant-build-cache \
+                          --ref "${GITHUB_REF}" \
+                          | cut --fields 1); do
                       echo "Deleting cache \"$CACHE\"."
                       gh cache delete "$CACHE"
                   done

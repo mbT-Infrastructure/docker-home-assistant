@@ -10,6 +10,8 @@ RUN mkdir --parents packages/homeassistant \
 
 ADD https://github.com/syssi/homeassistant-goecharger-mqtt.git#:custom_components \
     custom_components
+ADD https://github.com/mbT-Solutions/home-assistant-jkbms-mqtt.git#:custom_components \
+    custom_components
 
 COPY files/template template
 
